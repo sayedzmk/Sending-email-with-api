@@ -3,8 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\VerifyEmailByCode;
+use App\Mail\SendActiveCode;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Mail;
 
 class VerifyEmailByCodeFired
 {
@@ -21,6 +23,9 @@ class VerifyEmailByCodeFired
      */
     public function handle(VerifyEmailByCode $event): void
     {
-        dd($event);
+        $user = $event->user;
+        Mail::to($user->email)->send(new SendActiveCode(__('main.active_account', [
+            'type' => __('main.email')
+        ]), __('main.email_code_meg', ['code' => $user->email_code, 'name' => $user->name])));
     }
 }

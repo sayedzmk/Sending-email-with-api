@@ -30,4 +30,5 @@ Route::group([
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
     Route::post('resend/code', 'AuthController@resendActiveCode');
+    Route::post('active/code', 'AuthController@activeCode');
 });

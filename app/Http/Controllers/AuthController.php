@@ -17,6 +17,26 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
+    public function activeCode(Request $request)
+    {
+        $request->validate([
+            'code_type' => 'required|in:email,mobile',
+            'code' => 'required|integer'
+        ]);
+        if ($request->code_type == 'mobile') {
+        } elseif ($request->code_type == 'email') {
+            if ($request->code == AuthApi()->user()->email_code) {
+                $user = AuthApi()->user();
+                $user->email_code = null;
+                $user->email_verified_at = now();
+                $user->save();
+                $message = __('main.email_active_success');
+            } else {
+                $message = __('main.wrong_mesg');
+            }
+            return res_data([], $message);
+        }
+    }
     public function resendActiveCode(Request $request)
     {
         $data = $request->validate([
@@ -25,7 +45,9 @@ class AuthController extends Controller
         if ($request->code_type == 'mobile') {
         } elseif ($request->code_type == 'email') {
             event(new VerifyEmailByCode(User::find(AuthApi()->id())));
+            $message = __('main.code_send_to_email');
         }
+        return res_data([], $message);
     }
 
     public function register(Register $request)
